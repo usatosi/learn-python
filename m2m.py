@@ -23,21 +23,23 @@ class Form(AbstractConcreteBase, base):
   id = Column(Integer, primary_key = True)
   amount = Column(Integer)
 
-class AForm(Form, base):
-  __tablename__ = 'AForm'
-  __mapper_args__ = {
-  'polymorphic_identity':'AForm',
-  'concrete':True
+  @declared_attr
+  def __tablename__(cls):
+    return cls.__name__
+  
+  @declared_attr
+  def __mapper_args__(cls):
+    return {
+      'polymorphic_identity': cls.__name__,
+      'concrete':True
   }
+
+  
+class AForm(Form, base):
   atag = relationship('Tag', secondary = assoc, back_populates = 'aform')
 
 class BForm(Form, base):
-  __tablename__ = 'BForm'
-  __mapper_args__ = {
-  'polymorphic_identity':'BForm',
-  'concrete':True
-  }
-  btag = relationship('Tag', secondary = assoc, back_populates = 'bform')
+   btag = relationship('Tag', secondary = assoc, back_populates = 'bform')
 
 db_uri = 'sqlite:////tmp/m2m.sqlite'
 engine = create_engine(db_uri, echo =True)
