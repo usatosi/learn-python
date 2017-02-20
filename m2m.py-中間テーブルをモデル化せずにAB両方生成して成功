@@ -17,6 +17,7 @@ class Tag(base):
   id = Column(Integer, primary_key = True)
   name = Column(String)
   aform = relationship('AForm', secondary = assoc, back_populates = 'atag')
+  bform = relationship('BForm', secondary = assoc, back_populates = 'btag')
 
 class Form(AbstractConcreteBase, base):
   id = Column(Integer, primary_key = True)
@@ -36,6 +37,7 @@ class BForm(Form, base):
   'polymorphic_identity':'BForm',
   'concrete':True
   }
+  btag = relationship('Tag', secondary = assoc, back_populates = 'bform')
 
 db_uri = 'sqlite:////tmp/m2m.sqlite'
 engine = create_engine(db_uri, echo =True)
@@ -50,8 +52,14 @@ a = AForm(amount = 100)
 atag = Tag(name = 'booked')
 a.atag.append(atag)
 session.add(a)
+b = BForm(amount = 200)
+btag = Tag(name = 'canceled')
+b.btag.append(btag)
+session.add(b)
 session.commit()
 session.query(AForm).all()
-f=session.query(Form.amount, Form).first()
-print(f[1].atag[0].name)
-print(f[1])
+forms=session.query(Form.amount, Form).all()
+for f in forms:
+  print(f)
+#  print(f.atag[0].name)
+#  print(f.btag[0].name)
