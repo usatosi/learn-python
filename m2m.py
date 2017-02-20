@@ -16,8 +16,8 @@ class Tag(base):
   __tablename__ = 'Tag'
   id = Column(Integer, primary_key = True)
   name = Column(String)
-  aform = relationship('AForm', secondary = assoc, back_populates = 'atag')
-  bform = relationship('BForm', secondary = assoc, back_populates = 'btag')
+  aform = relationship('AForm', secondary = assoc, back_populates = 'tag')
+  bform = relationship('BForm', secondary = assoc, back_populates = 'tag')
 
 class Form(AbstractConcreteBase, base):
   id = Column(Integer, primary_key = True)
@@ -36,10 +36,10 @@ class Form(AbstractConcreteBase, base):
 
   
 class AForm(Form, base):
-  atag = relationship('Tag', secondary = assoc, back_populates = 'aform')
+  tag = relationship('Tag', secondary = assoc, back_populates = 'aform', foreign_keys = ['atag'])
 
 class BForm(Form, base):
-   btag = relationship('Tag', secondary = assoc, back_populates = 'bform')
+  tag = relationship('Tag', secondary = assoc, back_populates = 'bform', foreign_keys = ['btag'])
 
 db_uri = 'sqlite:////tmp/m2m.sqlite'
 engine = create_engine(db_uri, echo =True)
@@ -52,16 +52,16 @@ session = Session()
 
 a = AForm(amount = 100)
 atag = Tag(name = 'booked')
-a.atag.append(atag)
+a.tag.append(atag)
 session.add(a)
 b = BForm(amount = 200)
 btag = Tag(name = 'canceled')
-b.btag.append(btag)
+b.tag.append(btag)
 session.add(b)
 session.commit()
 session.query(AForm).all()
 forms=session.query(Form.amount, Form).all()
 for f in forms:
   print(f)
-#  print(f.atag[0].name)
-#  print(f.btag[0].name)
+  print(f.tag)#[0].name)
+  print(f.tag[0].name)
